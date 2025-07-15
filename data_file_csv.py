@@ -9,8 +9,11 @@ for filename in csv_files:
         reader = csv.DictReader(csvfile)
         for row in reader:
             if row["product"] == "Pink Morsels":
-                sales = int(row["quantity"] * float(row["price"]))
+                quantity = int(row["quantity"])
+                price = float(row["price"])
+                sales = quantity * price
                 data.append({"Sales": sales, "Date": row["date"], "Region": row["region"]})
+                
 fields = ['Sales', 'Date', 'Region']
 
 with open("data_file.csv", "w", newline='') as outfile:
