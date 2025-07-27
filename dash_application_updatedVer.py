@@ -34,7 +34,7 @@ df = pd.DataFrame(data)
 df['Date'] = pd.to_datetime(df['Date'])
 df['Region'] = df['Region'].str.lower()
 
-app = Dash()
+app = Dash(__name__)
 
 app.layout = html.Div(
     children=[
@@ -155,6 +155,8 @@ def update_graph(selected_region):
     )  
     fig.update_traces(textposition='top center', line=dict(width=3), marker=dict(size=7))
     return fig 
+    
+server = app.server
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run.server(debug=True)
