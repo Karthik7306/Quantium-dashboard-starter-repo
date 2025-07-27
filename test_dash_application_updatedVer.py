@@ -18,7 +18,7 @@ def test_visualization_present(dash_duo):
         EC.visibility_of_element_located((By.CSS_SELECTOR, "#sales-graph svg"))
     )
     graph_container = dash_duo.find_element("#sales-graph")   #Locate the container element that holds the sales graph
-    assert graph_container.is_displayed()   #Assert the fraph_container is visible
+    assert graph_container.is_displayed()   #Assert the graph_container is visible
 
 def test_region_picker_present(dash_duo):
     dash_duo.start_server(app)
