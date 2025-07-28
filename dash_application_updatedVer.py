@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 from datetime import datetime
 
+#Define color scheme for app styling and region plotting
 colors = {
     'background': "#E9F4F3",
     'text': "#f80707",
@@ -13,6 +14,8 @@ colors = {
 region_colors = {'north': "#490505", 'south': "#07d737", 'east': "#c00b87", 'west': "#24036a"}
 
 font_family = 'Calibri, Arial, TimesNewRoman'
+
+# Set up the sales dataset: Date, Region, and Sales graph lines
 
 data = {"Date": ["2021-01-10", "2021-01-25", "2021-02-17", 
                  "2021-01-12", "2021-01-15", "2021-02-15",
@@ -30,14 +33,16 @@ data = {"Date": ["2021-01-10", "2021-01-25", "2021-02-17",
                   24.0, 26.9, 32.3
                   ]}
 
-df = pd.DataFrame(data)
-df['Date'] = pd.to_datetime(df['Date'])
+df = pd.DataFrame(data)   # Create DataFrame for raw data and preprocess columns
+df['Date'] = pd.to_datetime(df['Date'])   # Convert 'Date' strings to datetime objects for plotting
 df['Region'] = df['Region'].str.lower()
 
-app = Dash(__name__)
+app = Dash(__name__)   # Initialize the Dash app
 
+#Define overall layout of the app with header, filter controls and graph
 app.layout = html.Div(
     children=[
+        # Main report header
         html.H1(
             'Pink Morsels Sales Report',
             style = {'textAlign': 'center', 'color': colors['header'], 'fontFamily': font_family, 'fontWeight': '900', 'letterSpacing': '1px', 'marginTop': '30px'}
@@ -46,6 +51,7 @@ app.layout = html.Div(
             'Filter sales by region:',
             style = {'textAlign': 'center', 'color': colors['text'], 'fontFamily': font_family, 'marginBottom': '16px', 'fontSize': '18px'}
         ),
+        # Radio buttons to select the sales region (All, North, South, East, West)
         html.Div(
             dcc.RadioItems(
                 id = 'region-radio',
@@ -56,7 +62,7 @@ app.layout = html.Div(
                     {'label': 'East', 'value': 'east'},
                     {'label': 'West', 'value': 'west'},
                 ],
-                value = 'all',
+                value = 'all',  # Default region selection
                 labelStyle = {
                     'display': 'inline-block', 
                     'marginRight': '16px',
@@ -74,6 +80,7 @@ app.layout = html.Div(
             ),
             style = {'textAlign': 'center'}
         ),
+        # Container for the Plotly sales graph
         html.Div(
             dcc.Graph(id = 'sales-graph'),
             style = {
@@ -87,16 +94,19 @@ app.layout = html.Div(
             }
         )   
     ],
+    # Set overall app background
     style={'backgroundColor': colors['background'], 'minHeight': '100vh', 'paddingBottom': '40px', 'fontFamily': font_family}
 )
 df['Sales_label'] = df['Sales'].apply(lambda x: f"{x:.1f} %")
-
+# Dash callback for sales graph updates on regions selected
 @app.callback(
     Output('sales-graph', 'figure'),
     Input('region-radio', 'value')
 )
 
 def update_graph(selected_region):
+    """Update the sales trend graph based on the selected region.
+    Adds a vertical line at January 15, 2021 for visual reference."""
     selected_region = selected_region.lower()
     all_regions = df['Region'].unique()
     if selected_region == 'all':
@@ -141,8 +151,9 @@ def update_graph(selected_region):
             labels={'Date': 'Date', 'Sales': 'Sales (Pounds)', 'Region': 'Region'}
         )
 
+    # Add a vertical line at January 15, 2021 as visual reference point
     fig.add_vline(x=datetime(2021, 1, 15), line_color="green", line_dash="dash")
-    fig.update_xaxes(range=["2021-01-01", "2021-02-28"])
+    fig.update_xaxes(range=["2021-01-01", "2021-02-28"])  #Limit the x-axis range to date range
 
     fig.update_layout(
         plot_bgcolor = colors['panel_bg'],
@@ -155,8 +166,8 @@ def update_graph(selected_region):
     )  
     fig.update_traces(textposition='top center', line=dict(width=3), marker=dict(size=7))
     return fig 
-    
-server = app.server
 
+server = app.server
+# Start the Dash app
 if __name__ == "__main__":
-    app.run.server(debug=True)
+    app.run(debug=True)
